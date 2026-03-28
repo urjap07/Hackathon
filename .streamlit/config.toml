@@ -1,8 +1,8 @@
 [theme]
-# Sovereign Dark Mode Theme
-primaryColor = "#2962ff"
-backgroundColor = "#0f172a"
-secondaryBackgroundColor = "#1e293b"
+# Sovereign Dark Mode Theme - Amethyst
+primaryColor = "#a855f7"
+backgroundColor = "#0f0c29"
+secondaryBackgroundColor = "#170b24"
 textColor = "#f8fafc"
 font = "sans serif"
 base = "dark"

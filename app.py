@@ -12,119 +12,402 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- High Fidelity CSS Injection ---
-st.markdown("""
-<style>
-    /* Navy Header Styling */
-    .navy-header {
-        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 12px;
-        margin-bottom: 2rem;
-        text-align: center;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-        border-bottom: 3px solid #3b82f6;
-    }
-    .navy-header h1 { color: #f8fafc; font-weight: 800; font-size: 2.5rem; margin-bottom: 0.5rem; padding: 0; }
-    .navy-header p { font-size: 1.2rem; color: #94a3b8; margin: 0; }
+# --- Sidebar Theme Toggle ---
+with st.sidebar:
+    st.markdown("## ⚙️ Portal Settings")
+    is_light_mode = st.toggle("🌞 Enable Light Mode", value=False)
+    st.markdown("---")
+    st.markdown("Switch the AcmeCorp Sovereign Portal theme between our classic Amethyst Dark Mode and our Crisp Light Mode.")
 
-    /* Score Styling */
-    .score-green { color: #22c55e; text-shadow: 0 0 10px rgba(34, 197, 94, 0.4); }
-    .score-yellow { color: #eab308; text-shadow: 0 0 10px rgba(234, 179, 8, 0.4); }
-    .score-red { color: #ef4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+# --- Dynamic Theme Generator ---
+if is_light_mode:
+    theme_css = """
+    /* Global Overrides - Crisp Light Mode */
+    .stApp { 
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        color: #0f172a;
+    }
     
-    .score-number { font-size: 3.5rem; font-weight: 800; line-height: 1; margin: 0;}
-    .score-label { font-size: 1rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
+    /* Top Navigation Bar Fix for Light Mode */
+    [data-testid="stHeader"] {
+        background-color: #f8fafc !important;
+    }
+    [data-testid="stHeader"] * {
+        color: #0f172a !important;
+    }
+    
+    /* Hero Section */
+    .hero-header {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(168, 85, 247, 0.6);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+        padding: 3rem 2rem;
+        border-radius: 16px;
+        margin-bottom: 2.5rem;
+        margin-top: 1rem;
+        text-align: center;
+        position: relative;
+    }
+    .hero-header h1 { color: #1e1b4b; font-weight: 900; font-size: 3rem; margin-bottom: 0.5rem; padding: 0; text-shadow: 0 2px 10px rgba(168, 85, 247, 0.2); }
+    .hero-header p { font-size: 1.25rem; color: #475569; margin: 0; font-weight: 600; letter-spacing: 0.5px;}
+
+    /* Force Streamlit Expander Boxes */
+    [data-testid="stExpander"] {
+        background: rgba(255, 255, 255, 0.9) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        border: 1px solid rgba(168, 85, 247, 0.6) !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+    }
+    [data-testid="stExpander"] summary { 
+        color: #1e1b4b !important; 
+        font-weight: 800 !important; 
+        padding: 10px !important;
+        background-color: transparent !important;
+    }
+    [data-testid="stExpander"] summary:hover { background-color: rgba(0,0,0,0.03) !important; }
+    [data-testid="stExpander"] p { color: #334155 !important;}
+    
+    /* Input Labels (e.g. "Department") */
+    [data-testid="stWidgetLabel"] p, [data-testid="stWidgetLabel"] label {
+        color: #0f172a !important;
+        font-weight: 600 !important;
+    }
+    /* Input Boxes (Select dropdowns) */
+    div[data-baseweb="select"] > div {
+        background: rgba(255, 255, 255, 0.9) !important;
+        border: 1px solid rgba(168, 85, 247, 0.6) !important;
+        border-radius: 8px !important;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.02) !important;
+    }
+    /* Force select dropdown text to be unequivocally dark */
+    div[data-baseweb="select"] * { color: #0f172a !important; }
+    
+    /* Text Area Input */
+    .stTextArea textarea {
+        background: rgba(255, 255, 255, 0.9) !important;
+        border: 1px solid rgba(168, 85, 247, 0.6) !important;
+        border-radius: 8px !important;
+        color: #0f172a !important;
+        font-weight: 500 !important;
+        padding: 1rem !important;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.02) !important;
+    }
+    .stTextArea textarea::placeholder {
+        color: #64748b !important;
+        opacity: 1 !important;
+    }
+    .stTextArea textarea:focus, div[data-baseweb="select"]:focus-within > div {
+        border-color: #a855f7 !important;
+        box-shadow: 0 0 15px rgba(168, 85, 247, 0.3) !important;
+        outline: none !important;
+    }
+    
+    /* Generate Button styling for maximum legibility */
+    .stButton>button { border: 2px solid #a855f7 !important; background-color: rgba(168, 85, 247, 0.1) !important; transition: all 0.3s ease; font-weight: 800 !important; letter-spacing: 0.5px; height: 3rem; color: #7e22ce !important;}
+    .stButton>button:hover { background-color: #a855f7 !important; box-shadow: 0 0 20px rgba(168, 85, 247, 0.6) !important; transform: translateY(-2px); color: white !important;}
+
+    /* Headers & Text globally (scoping to Main App Area to protect Sidebar) */
+    [data-testid="stAppViewBlockContainer"] h3, 
+    [data-testid="stAppViewBlockContainer"] h1, 
+    [data-testid="stAppViewBlockContainer"] h2, 
+    [data-testid="stAppViewBlockContainer"] p { color: #0f172a; }
+    
+    /* Fix Sidebar text visibility under Light Mode (Two-Tone Layout) */
+    [data-testid="stSidebar"] span, 
+    [data-testid="stSidebar"] p { color: #f8fafc !important; text-shadow: none;}
+
+    /* Score Visualizer */
+    .score-green { color: #16a34a; text-shadow: 0 0 10px rgba(22, 163, 74, 0.2); }
+    .score-yellow { color: #d97706; text-shadow: 0 0 10px rgba(217, 119, 6, 0.2); }
+    .score-red { color: #dc2626; text-shadow: 0 0 10px rgba(220, 38, 38, 0.2); }
+    
+    .score-number { font-size: 4.5rem; font-weight: 900; line-height: 1; margin: 0;}
+    .stat-line { font-size: 0.95rem; color: #64748b; margin-top: 8px; font-weight: 700;}
     
     /* Verdict Badge */
     .verdict-badge {
-        font-size: 1.5rem;
-        font-weight: 800;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
+        font-size: 1.8rem;
+        font-weight: 900;
+        padding: 0.6rem 1.5rem;
+        border-radius: 12px;
         display: inline-block;
-        margin-top: 10px;
+        margin-top: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        letter-spacing: 1px;
     }
-    .verdict-approved { background-color: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; color: #22c55e; }
-    .verdict-blocked { background-color: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; }
+    .verdict-approved { background-color: rgba(34, 197, 94, 0.1); border: 2px solid #16a34a; color: #16a34a; }
+    .verdict-blocked { background-color: rgba(239, 68, 68, 0.1); border: 2px solid #dc2626; color: #dc2626; }
 
-    /* Generated Content Box (Blocked State) */
+    /* Generated Output Container with Glassmorphism */
+    .content-box {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid rgba(168, 85, 247, 0.4);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+        color: #0f172a;
+    }
     .content-blocked-wrapper {
-        border: 2px solid #ef4444;
-        border-radius: 8px;
-        padding: 1.5rem 1rem 1rem 1rem;
-        position: relative;
+        border: 3px solid #dc2626;
         background-color: rgba(239, 68, 68, 0.05);
-        margin-top: 1.5rem;
+        position: relative;
+        overflow: hidden;
     }
     .do-not-publish-tag {
         position: absolute;
-        top: -12px;
-        left: 15px;
-        background: #ef4444;
-        color: white;
-        font-weight: 800;
-        padding: 2px 10px;
-        border-radius: 4px;
-        font-size: 0.85rem;
-        letter-spacing: 1px;
+        top: 0; left: 0; right: 0; bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: rgba(220, 38, 38, 0.15);
+        font-size: 4.5rem;
+        font-weight: 900;
+        pointer-events: none;
+        transform: rotate(-15deg);
+        z-index: 0;
+        white-space: nowrap;
+        letter-spacing: 2px;
     }
     
-    /* Red Flag Violation Cards */
+    /* Red Flag Violation Cards with Glassmorphism */
     .violation-card {
-        background-color: #1e1e1e;
-        border-left: 5px solid #ef4444;
-        padding: 15px;
-        margin-bottom: 12px;
-        border-radius: 6px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-    .violation-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;}
-    .violation-title { font-weight: 700; color: #fca5a5; font-size: 1.1rem; margin:0;}
-    .violation-points { background: rgba(239, 68, 68, 0.2); color: #fca5a5; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 800; }
-    .violation-text { font-style: italic; color: #e2e8f0; margin: 0 0 8px 0; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 4px; border-left: 2px solid #64748b;}
-    .violation-ref { font-size: 0.85rem; color: #94a3b8; margin: 0; font-weight: 600;}
-
-    /* Amber Recommendation Box */
-    .recommendation-box {
-        background-color: rgba(245, 158, 11, 0.1);
-        border: 1px solid #f59e0b;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 20px;
+        margin-bottom: 15px;
         border-radius: 8px;
-        padding: 1rem;
-        margin-top: 2rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border: 1px solid rgba(220, 38, 38, 0.2);
+        border-left: 6px solid #dc2626;
     }
-    .amber-title { color: #fbbf24; font-weight: 800; font-size: 1.2rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;}
-    .amber-title::before { content: '💡'; }
-    .amber-text { color: #fef3c7; margin: 0; line-height: 1.5;}
-</style>
-""", unsafe_allow_html=True)
+    .violation-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;}
+    .violation-title { font-weight: 800; color: #dc2626; font-size: 1.2rem; margin:0;}
+    .violation-points { background: rgba(220, 38, 38, 0.1); color: #dc2626; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 800; border: 1px solid rgba(220, 38, 38, 0.4);}
+    .violation-text { font-style: italic; color: #1e293b; margin: 0 0 10px 0; background: rgba(0,0,0,0.03); padding: 12px; border-radius: 6px; border-left: 2px solid #dc2626; font-size: 1.05rem;}
+    .violation-ref { font-size: 0.9rem; color: #475569; margin: 0; font-weight: 700;}
+
+    /* Amber Recommendation Box with Glassmorphism */
+    .recommendation-box {
+        background: rgba(245, 158, 11, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(245, 158, 11, 0.5);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .amber-title { color: #d97706; font-weight: 800; font-size: 1.3rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;}
+    .amber-text { color: #78350f; margin: 0; line-height: 1.6; font-size: 1.1rem; font-weight: 600;}
+    
+    /* Code styling for light mode */
+    code { color: #8b5cf6 !important; background-color: rgba(139, 92, 246, 0.08) !important; font-weight: 500;}
+    """
+else:
+    theme_css = """
+    /* Global Overrides - Reliable Radial Gradient */
+    .stApp { 
+        background: radial-gradient(circle at top left, #1e1332 0%, #05010a 100%);
+    }
+    
+    /* Hero Section with Restored Glassmorphism */
+    .hero-header {
+        background: rgba(23, 11, 36, 0.5);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(168, 85, 247, 0.4);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: 16px;
+        margin-bottom: 2.5rem;
+        margin-top: 1rem;
+        text-align: center;
+        position: relative;
+    }
+    .hero-header h1 { color: #f8fafc; font-weight: 800; font-size: 3rem; margin-bottom: 0.5rem; padding: 0; text-shadow: 0 2px 10px rgba(168, 85, 247, 0.8); }
+    .hero-header p { font-size: 1.25rem; color: #cbd5e1; margin: 0; font-weight: 300; letter-spacing: 0.5px;}
+
+    /* Force Streamlit Expander Boxes with Glassmorphism */
+    [data-testid="stExpander"] {
+        background: rgba(23, 11, 36, 0.5) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        border: 1px solid rgba(168, 85, 247, 0.4) !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+    }
+    [data-testid="stExpander"] summary { color: #f8fafc; font-weight: 600; padding: 10px;}
+    
+    /* Input Boxes (Select Dropdowns & Text Areas) with Glassmorphism */
+    div[data-baseweb="select"] > div {
+        background: rgba(23, 11, 36, 0.5) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        border: 1px solid rgba(168, 85, 247, 0.4) !important;
+        border-radius: 8px !important;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.3) !important;
+    }
+    .stTextArea textarea {
+        background: rgba(23, 11, 36, 0.5) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        border: 1px solid rgba(168, 85, 247, 0.4) !important;
+        border-radius: 8px !important;
+        color: #f8fafc !important;
+        padding: 1rem !important;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.3) !important;
+    }
+    .stTextArea textarea:focus, div[data-baseweb="select"]:focus-within > div {
+        border-color: #a855f7 !important;
+        box-shadow: 0 0 15px rgba(168, 85, 247, 0.5) !important;
+        outline: none !important;
+    }
+    
+    /* Buttons */
+    .stButton>button { border: 1px solid #a855f7; background-color: rgba(168, 85, 247, 0.2); transition: all 0.3s ease; font-weight: 600; letter-spacing: 0.5px; height: 3rem; backdrop-filter: blur(5px);}
+    .stButton>button:hover { background-color: rgba(168, 85, 247, 0.6); box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); transform: translateY(-2px); color: white;}
+
+    /* Score Visualizer */
+    .score-green { color: #22c55e; text-shadow: 0 0 20px rgba(34, 197, 94, 0.6); }
+    .score-yellow { color: #eab308; text-shadow: 0 0 20px rgba(234, 179, 8, 0.6); }
+    .score-red { color: #ef4444; text-shadow: 0 0 20px rgba(239, 68, 68, 0.6); }
+    
+    .score-number { font-size: 4.5rem; font-weight: 900; line-height: 1; margin: 0;}
+    .stat-line { font-size: 0.95rem; color: #94a3b8; margin-top: 8px; font-weight: 500;}
+    
+    /* Verdict Badge */
+    .verdict-badge {
+        font-size: 1.8rem;
+        font-weight: 900;
+        padding: 0.6rem 1.5rem;
+        border-radius: 12px;
+        display: inline-block;
+        margin-top: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        letter-spacing: 1px;
+    }
+    .verdict-approved { background-color: rgba(34, 197, 94, 0.15); border: 2px solid #22c55e; color: #22c55e; }
+    .verdict-blocked { background-color: rgba(239, 68, 68, 0.15); border: 2px solid #ef4444; color: #ef4444; }
+
+    /* Generated Output Container with Glassmorphism */
+    .content-box {
+        background: rgba(23, 11, 36, 0.5);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid rgba(168, 85, 247, 0.4);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    }
+    .content-blocked-wrapper {
+        border: 3px solid #ef4444;
+        background-color: rgba(239, 68, 68, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+    .do-not-publish-tag {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: rgba(239, 68, 68, 0.12);
+        font-size: 4.5rem;
+        font-weight: 900;
+        pointer-events: none;
+        transform: rotate(-15deg);
+        z-index: 0;
+        white-space: nowrap;
+        letter-spacing: 2px;
+    }
+    
+    /* Red Flag Violation Cards with Glassmorphism */
+    .violation-card {
+        background: rgba(23, 11, 36, 0.5);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 20px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        border-left: 6px solid #ef4444;
+    }
+    .violation-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;}
+    .violation-title { font-weight: 800; color: #fca5a5; font-size: 1.2rem; margin:0;}
+    .violation-points { background: rgba(239, 68, 68, 0.2); color: #fca5a5; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 800; border: 1px solid rgba(239, 68, 68, 0.4);}
+    .violation-text { font-style: italic; color: #e2e8f0; margin: 0 0 10px 0; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; border-left: 2px solid #ef4444; font-size: 1.05rem;}
+    .violation-ref { font-size: 0.9rem; color: #94a3b8; margin: 0; font-weight: 600;}
+
+    /* Amber Recommendation Box with Glassmorphism */
+    .recommendation-box {
+        background: rgba(245, 158, 11, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(245, 158, 11, 0.5);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    .amber-title { color: #fbbf24; font-weight: 800; font-size: 1.3rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;}
+    .amber-text { color: #fef3c7; margin: 0; line-height: 1.6; font-size: 1.1rem;}
+    """
+
+# Inject Dynamic CSS
+st.markdown(f"<style>{theme_css}</style>", unsafe_allow_html=True)
 
 # --- Header Section ---
 st.markdown("""
-<div class="navy-header">
+<div class="hero-header">
     <h1>AcmeCorp AI Portal</h1>
     <p>Sovereign AI Gateway for Enterprise Content</p>
 </div>
 """, unsafe_allow_html=True)
 
+# --- How to Use Section ---
+st.markdown("### 💡 About & Help")
+col_help1, col_help2, col_help3 = st.columns(3)
+
+with col_help1:
+    with st.expander("1. Define Intent"):
+        st.write("Select **Dept** & **Content Type** to route requests through tailored Knowledge Bases.")
+
+with col_help2:
+    with st.expander("2. Agentic Processing"):
+        st.write("The Architect drafts while the Governance Referee scores against enterprise policies.")
+
+with col_help3:
+    with st.expander("3. Verify & Export"):
+        st.write("Review the Compliance Score and use the 1-click **Copy** tool safely.")
+
+st.divider()
+
 # --- Input Section ---
-st.markdown("### Prepare Your Request")
-col1, col2 = st.columns(2)
+col_in1, col_in2 = st.columns(2)
 
-with col1:
-    department = st.selectbox("Department", ["Marketing", "HR", "Sales", "Legal", "Executive"])
-with col2:
-    content_type = st.selectbox("Content Type", ["Social Media Post", "Internal Memo", "Press Release", "Email Campaign"])
+with col_in1:
+    department = st.selectbox("Department", ["HR", "Sales", "Marketing", "Operations"])
+with col_in2:
+    content_type = st.selectbox("Content Type", ["Poster", "Social Media Post", "Internal Memo", "Email Campaign"])
 
-user_prompt = st.text_area("What do you need help with?", placeholder="e.g., Draft a tweet about our upcoming Q4 financial results...", height=120)
+user_prompt = st.text_area("What do you need help with?", placeholder="e.g. Give me a poster for a Shoes Business where there is a 30% discount...", height=120)
 
 if st.button("Generate & Verify", type="primary", use_container_width=True):
     if not user_prompt.strip():
         st.warning("Please provide a prompt.")
         st.stop()
 
-    with st.spinner("AcmeCorp AI is generating and validating your content..."):
+    with st.status("AcmeCorp AI is orchestrating agents...", expanded=True) as status:
+        st.write("Forwarding intent to specialized Knowledge Base...")
         payload = {
             "department": department,
             "content_type": content_type,
@@ -134,22 +417,24 @@ if st.button("Generate & Verify", type="primary", use_container_width=True):
         try:
             response = requests.post(N8N_WEBHOOK_URL, json=payload, timeout=60)
             response.raise_for_status()
+            
+            st.write("Evaluating results against Governance Constraints...")
             result = response.json()
             
-            # Unwrap array if n8n passes back a list of objects
             if isinstance(result, list) and len(result) > 0:
                 result = result[0]
                 
+            status.update(label="Validation Complete", state="complete", expanded=False)
             st.divider()
             
-            # --- Extract Expected JSON Keys safely ---
+            # --- Extract Expected JSON Keys ---
             score = int(result.get("score", 0))
             verdict = str(result.get("verdict", "BLOCKED")).upper()
             content = result.get("content", "Error: No content generated.")
             violations = result.get("violations", [])
             recommendation = result.get("recommendation", "No recommendation provided.")
             
-            # Determine Score Color Logic
+            # Score Color Logic
             if score >= 80:
                 score_class = "score-green"
             elif score >= 50:
@@ -157,7 +442,7 @@ if st.button("Generate & Verify", type="primary", use_container_width=True):
             else:
                 score_class = "score-red"
                 
-            # Determine Verdict Badge Styling
+            # Verdict Badge Logic
             badge_class = "verdict-approved" if verdict == "APPROVED" else "verdict-blocked"
             badge_icon = "✅" if verdict == "APPROVED" else "🚫"
 
@@ -166,40 +451,58 @@ if st.button("Generate & Verify", type="primary", use_container_width=True):
             c1, c2 = st.columns([1, 2])
             
             with c1:
-                # Scorecard
                 st.markdown(f"""
-                <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
-                    <p class="score-label">Policy Match Score</p>
+                <div style="text-align: center; padding: 1.5rem; background: rgba(255,255,255,0.03); border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
                     <p class="score-number {score_class}">{score}</p>
+                    <p class="stat-line">10 policies checked</p>
                 </div>
                 """, unsafe_allow_html=True)
                 
             with c2:
-                # Verdict Badge
                 st.markdown(f"""
-                <div style="display: flex; flex-direction: column; justify-content: center; height: 100%; padding-left: 1rem;">
-                    <p style="margin:0; color:#94a3b8; font-weight:600; text-transform:uppercase; font-size:0.9rem;">Final Decision</p>
-                    <div class="verdict-badge {badge_class}">{badge_icon} {verdict}</div>
+                <div style="display: flex; flex-direction: column; justify-content: center; height: 100%; padding-left: 2rem;">
+                    <p style="margin:0; color:#94a3b8; font-weight:600; text-transform:uppercase; font-size:1rem; letter-spacing: 1.5px;">Final Verdict</p>
+                    <div class="verdict-badges" style="margin-top:8px;">
+                        <span class="verdict-badge {badge_class}">{badge_icon} {verdict}</span>
+                    </div>
                 </div>
                 """, unsafe_allow_html=True)
 
             # --- Generated Content Box ---
-            st.markdown("### Generated Output")
+            st.markdown("<h3 style='margin-top: 2rem;'>Generated Output</h3>", unsafe_allow_html=True)
+
+            def render_content_smartly(c_val):
+                c_clean = str(c_val).strip()
+                
+                # Scenario 1: n8n returned a direct URL to a generated image/flyer
+                if c_clean.startswith("http") and "\n" not in c_clean and " " not in c_clean:
+                    st.image(c_clean, caption=f"Generated Asset", use_container_width=True)
+                    
+                # Scenario 2: n8n returned Text containing embedded Markdown images or HTML images
+                elif "![" in c_clean or "<img" in c_clean:
+                    st.markdown(c_clean, unsafe_allow_html=True)
+                    
+                # Scenario 3: n8n returned a text-based post/memo. Render in the 1-click Copy Box!
+                else:
+                    st.code(c_val, language="markdown")
+
             if verdict == "APPROVED":
                 st.success("This content has passed all governance checks. You may safely publish it.")
-                st.code(content, language="markdown") # Uses Streamlit's native copy button
+                st.markdown('<div class="content-box">', unsafe_allow_html=True)
+                render_content_smartly(content)
+                st.markdown('</div>', unsafe_allow_html=True)
             else:
-                # Blocked render state with red border wrapper
-                st.markdown(f"""
-                <div class="content-blocked-wrapper">
-                    <div class="do-not-publish-tag">DO NOT PUBLISH</div>
-                </div>
-                """, unsafe_allow_html=True)
-                st.code(content, language="markdown")
+                st.error("This content violates corporate policies and must be rewritten.")
+                st.markdown('<div class="content-box content-blocked-wrapper">', unsafe_allow_html=True)
+                st.markdown('<div class="do-not-publish-tag">⚠️ DO NOT PUBLISH</div>', unsafe_allow_html=True)
+                # Ensure the text is on top of watermark
+                st.markdown('<div style="position:relative; z-index:1;">', unsafe_allow_html=True)
+                render_content_smartly(content)
+                st.markdown('</div></div>', unsafe_allow_html=True)
 
             # --- Violations Panel ---
             if verdict == "BLOCKED" and violations:
-                st.markdown("<h3 style='color: #ef4444; margin-top:2rem;'>🚩 Identified Policy Violations</h3>", unsafe_allow_html=True)
+                st.markdown("<h3 style='color: #ef4444; margin-top:2.5rem; border-bottom: 1px solid rgba(239,68,68,0.3); padding-bottom: 10px;'>🚩 Policy Violations</h3>", unsafe_allow_html=True)
                 
                 for flag in violations:
                     fname = flag.get("flag_name", "Unknown Violation")
@@ -218,17 +521,18 @@ if st.button("Generate & Verify", type="primary", use_container_width=True):
                     </div>
                     """, unsafe_allow_html=True)
 
-            # --- Recommendation Panel ---
+            # --- Recommendation Box ---
             if verdict == "BLOCKED" and recommendation:
                 st.markdown(f"""
                 <div class="recommendation-box">
-                    <p class="amber-title">How to fix this</p>
+                    <p class="amber-title">💡 How to fix this</p>
                     <p class="amber-text">{recommendation}</p>
                 </div>
                 """, unsafe_allow_html=True)
 
         except requests.exceptions.RequestException as e:
-            st.error("❌ Webhook Connection Failed. Ensure your n8n test webhook is listening before generating!")
+            status.update(label="Webhook Connection Failed", state="error", expanded=True)
+            st.error("❌ Ensure your n8n test webhook is listening before generating!")
         except Exception as e:
-            st.error(f"❌ Failed to parse backend validation payload. Ensure n8n returns the exact schema (score, verdict, content, violations, recommendation). Error: {e}")
-            st.code(response.text) # Dump what n8n actually sent for debugging
+            status.update(label="Validation Error", state="error", expanded=True)
+            st.error(f"❌ Failed to parse backend validation payload. Error: {e}")
