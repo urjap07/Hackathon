@@ -85,6 +85,7 @@ if st.button("Generate & Verify", type="primary", use_container_width=True):
         st.warning("Please provide a prompt.")
         st.stop()
 
+    # The status block shows the background process
     with st.status("AcmeCorp AI is orchestrating agents...", expanded=True) as status:
         payload = {
             "department": department,
@@ -97,12 +98,10 @@ if st.button("Generate & Verify", type="primary", use_container_width=True):
             response.raise_for_status()
             result = response.json()
             
-            # Extract first object if response is a list
             if isinstance(result, list) and len(result) > 0:
                 result = result[0]
                 
-            status.update(label="Validation Complete", state="complete", expanded=False)
-            st.divider()
+            status.update(label="✅ Validation Complete", state="complete", expanded=False)
             
             # --- 1. Data Extraction ---
             score = int(result.get("score", 0))
@@ -112,43 +111,39 @@ if st.button("Generate & Verify", type="primary", use_container_width=True):
             recommendation = result.get("recommendation", "No recommendation provided.")
             
             # --- 2. Generated Output Section (TOP) ---
+            st.divider()
             st.markdown("### 📝 Generated Output")
 
             def render_content_smartly(c_val):
                 c_clean = str(c_val).strip()
-                # Check if output is an image URL
                 if c_clean.startswith("http") and "\n" not in c_clean:
                     st.image(c_clean, use_container_width=True)
-                # Check for Markdown/HTML images
                 elif "![" in c_clean or "<img" in c_clean:
                     st.markdown(c_clean, unsafe_allow_html=True)
                 else:
                     st.code(c_val, language="markdown")
 
             if verdict == "APPROVED":
-                st.success("Governance Passed: Safe for publication.")
+                st.success("Governance Passed: This content is approved for publication.")
                 st.markdown('<div class="content-box">', unsafe_allow_html=True)
                 render_content_smartly(content)
                 st.markdown('</div>', unsafe_allow_html=True)
             else:
-                st.error("Governance Blocked: Modification required.")
+                st.error("Governance Blocked: This content requires modification.")
                 st.markdown('<div class="content-box content-blocked-wrapper">', unsafe_allow_html=True)
                 st.markdown('<div class="do-not-publish-tag">⚠️ DO NOT PUBLISH</div>', unsafe_allow_html=True)
                 st.markdown('<div style="position:relative; z-index:1;">', unsafe_allow_html=True)
                 render_content_smartly(content)
                 st.markdown('</div></div>', unsafe_allow_html=True)
 
-            st.divider()
-
             # --- 3. Compliance Gauge Section (MIDDLE) ---
             st.markdown("### 📊 Compliance Verification Gauge")
             col_gauge, col_label = st.columns([1, 1])
             
             with col_gauge:
-                # Gauge Color Logic (matches your theme classes)
                 color = "#ef4444" if score < 50 else "#eab308" if score < 80 else "#22c55e"
                 st.markdown(f"""
-                    <div style="text-align: center;">
+                    <div style="text-align: center; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);">
                         <h1 style="color: {color}; font-size: 4.5rem; margin: 0;">{score}%</h1>
                         <p style="font-weight: 700; opacity: 0.8; letter-spacing: 1px;">ADHERENCE SCORE</p>
                     </div>
@@ -157,7 +152,7 @@ if st.button("Generate & Verify", type="primary", use_container_width=True):
             with col_label:
                 st.write(f"**Final Status:** {verdict}")
                 st.progress(score / 100)
-                st.caption("Content evaluated against enterprise safety and tone benchmarks.")
+                st.caption("Content evaluated against 10 internal corporate policy benchmarks.")
 
             # --- 4. Violations & Reasons Section ---
             if violations:
@@ -165,7 +160,7 @@ if st.button("Generate & Verify", type="primary", use_container_width=True):
                 for flag in violations:
                     fname = flag.get("flag_name", "Policy Breach")
                     ftext = flag.get("violated_text", "N/A")
-                    freason = flag.get("reason", "Violation of corporate guidelines.") # New field
+                    freason = flag.get("reason", "Violation of corporate guidelines.")
                     fpoints = flag.get("points_deducted", 0)
                     
                     st.markdown(f"""
@@ -181,7 +176,7 @@ if st.button("Generate & Verify", type="primary", use_container_width=True):
                     """, unsafe_allow_html=True)
 
             # --- 5. Suggestions Section (BOTTOM) ---
-            if verdict == "BLOCKED":
+            if verdict == "BLOCKED" or recommendation != "No recommendation provided.":
                 st.markdown(f"""
                 <div class="recommendation-box">
                     <p class="amber-title">💡 Resolution Road-map</p>
@@ -190,4 +185,4 @@ if st.button("Generate & Verify", type="primary", use_container_width=True):
                 """, unsafe_allow_html=True)
 
         except Exception as e:
-            st.error(f"❌ Failed to parse backend payload. Error: {e}")
+            st.error(f"❌ Connection or Processing Error: {e}")
