@@ -86,69 +86,86 @@ if st.button("Generate & Verify", type="primary", use_container_width=True):
         st.stop()
 
     with st.status("AcmeCorp AI is orchestrating agents...", expanded=True) as status:
-        payload = {"department": department, "content_type": content_type, "user_prompt": user_prompt}
+        payload = {
+            "department": department,
+            "content_type": content_type,
+            "user_prompt": user_prompt
+        }
         
         try:
             response = requests.post(N8N_WEBHOOK_URL, json=payload, timeout=60)
             response.raise_for_status()
             result = response.json()
-            if isinstance(result, list) and len(result) > 0: result = result[0]
             
+            # Extract first object if response is a list
+            if isinstance(result, list) and len(result) > 0:
+                result = result[0]
+                
             status.update(label="Validation Complete", state="complete", expanded=False)
             st.divider()
-
-            # --- Extract Data ---
+            
+            # --- 1. Data Extraction ---
             score = int(result.get("score", 0))
             verdict = str(result.get("verdict", "BLOCKED")).upper()
             content = result.get("content", "Error: No content generated.")
             violations = result.get("violations", [])
             recommendation = result.get("recommendation", "No recommendation provided.")
-
-            # --- 1. Generated Content Box (TOP) ---
-            st.markdown("### 📝 Generated Output")
             
-            def render_content(c_val):
+            # --- 2. Generated Output Section (TOP) ---
+            st.markdown("### 📝 Generated Output")
+
+            def render_content_smartly(c_val):
                 c_clean = str(c_val).strip()
+                # Check if output is an image URL
                 if c_clean.startswith("http") and "\n" not in c_clean:
                     st.image(c_clean, use_container_width=True)
+                # Check for Markdown/HTML images
                 elif "![" in c_clean or "<img" in c_clean:
                     st.markdown(c_clean, unsafe_allow_html=True)
                 else:
                     st.code(c_val, language="markdown")
 
             if verdict == "APPROVED":
-                st.success("Governance Passed: Content is ready for use.")
+                st.success("Governance Passed: Safe for publication.")
                 st.markdown('<div class="content-box">', unsafe_allow_html=True)
-                render_content(content)
+                render_content_smartly(content)
                 st.markdown('</div>', unsafe_allow_html=True)
             else:
                 st.error("Governance Blocked: Modification required.")
                 st.markdown('<div class="content-box content-blocked-wrapper">', unsafe_allow_html=True)
                 st.markdown('<div class="do-not-publish-tag">⚠️ DO NOT PUBLISH</div>', unsafe_allow_html=True)
                 st.markdown('<div style="position:relative; z-index:1;">', unsafe_allow_html=True)
-                render_content(content)
+                render_content_smartly(content)
                 st.markdown('</div></div>', unsafe_allow_html=True)
 
             st.divider()
 
-            # --- 2. Compliance Gauge (MIDDLE) ---
+            # --- 3. Compliance Gauge Section (MIDDLE) ---
             st.markdown("### 📊 Compliance Verification Gauge")
-            col_g1, col_g2 = st.columns([1, 1])
-            with col_g1:
+            col_gauge, col_label = st.columns([1, 1])
+            
+            with col_gauge:
+                # Gauge Color Logic (matches your theme classes)
                 color = "#ef4444" if score < 50 else "#eab308" if score < 80 else "#22c55e"
-                st.markdown(f"<h1 style='text-align: center; color: {color}; font-size: 4rem; margin:0;'>{score}%</h1><p style='text-align: center; font-weight: 700; opacity: 0.8;'>COMPLIANCE SCORE</p>", unsafe_allow_html=True)
-            with col_g2:
-                st.write(f"**Final Verdict:** {verdict}")
+                st.markdown(f"""
+                    <div style="text-align: center;">
+                        <h1 style="color: {color}; font-size: 4.5rem; margin: 0;">{score}%</h1>
+                        <p style="font-weight: 700; opacity: 0.8; letter-spacing: 1px;">ADHERENCE SCORE</p>
+                    </div>
+                """, unsafe_allow_html=True)
+                
+            with col_label:
+                st.write(f"**Final Status:** {verdict}")
                 st.progress(score / 100)
-                st.caption("Content scored against 10 enterprise policy benchmarks.")
+                st.caption("Content evaluated against enterprise safety and tone benchmarks.")
 
-            # --- 3. Violations Section (BOTTOM) ---
+            # --- 4. Violations & Reasons Section ---
             if violations:
-                st.markdown("<h3 style='color: #ef4444; margin-top:2.5rem;'>🚩 Policy Violations</h3>", unsafe_allow_html=True)
+                st.markdown("<h3 style='color: #ef4444; margin-top:2rem;'>🚩 Policy Violations</h3>", unsafe_allow_html=True)
                 for flag in violations:
-                    fname = flag.get("flag_name", "Breach Detected")
+                    fname = flag.get("flag_name", "Policy Breach")
                     ftext = flag.get("violated_text", "N/A")
-                    freason = flag.get("reason", "Violates corporate tone or brand safety.")
+                    freason = flag.get("reason", "Violation of corporate guidelines.") # New field
                     fpoints = flag.get("points_deducted", 0)
                     
                     st.markdown(f"""
@@ -157,20 +174,20 @@ if st.button("Generate & Verify", type="primary", use_container_width=True):
                             <p class="violation-title">{fname}</p>
                             <span class="violation-points">-{fpoints} Pts</span>
                         </div>
-                        <p style="font-style: italic; opacity: 0.9; margin-bottom: 8px;">"{ftext}"</p>
-                        <p style="margin: 0; font-weight: 700; font-size: 0.9rem;">Reason:</p>
-                        <p style="margin: 0; opacity: 0.8;">{freason}</p>
+                        <p class="violation-text">"{ftext}"</p>
+                        <p style="margin: 0; font-weight: 700; font-size: 0.9rem;">Reason for Flagging:</p>
+                        <p style="opacity: 0.9; margin-bottom: 0;">{freason}</p>
                     </div>
                     """, unsafe_allow_html=True)
 
-            # --- 4. Recommendation Section (LAST) ---
+            # --- 5. Suggestions Section (BOTTOM) ---
             if verdict == "BLOCKED":
                 st.markdown(f"""
                 <div class="recommendation-box">
-                    <p style="color: #fbbf24; font-weight: 800; font-size: 1.3rem; margin-bottom: 10px;">💡 Resolution Steps</p>
-                    <p style="margin: 0; line-height: 1.6;">{recommendation}</p>
+                    <p class="amber-title">💡 Resolution Road-map</p>
+                    <p class="amber-text">{recommendation}</p>
                 </div>
                 """, unsafe_allow_html=True)
 
         except Exception as e:
-            st.error(f"❌ Connection or Parsing Error: {e}")
+            st.error(f"❌ Failed to parse backend payload. Error: {e}")
