@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 
 # --- Constants ---
-N8N_WEBHOOK_URL = "https://hriday.datachef.in/webhook/41ff8937-9d4f-4128-b786-52ab925f1062"
+N8N_WEBHOOK_URL = "https://hriday.datachef.in/webhook-test/50e12966-853b-4891-9253-a52b8bb359e2"
 
 # --- Page Configuration ---
 st.set_page_config(
