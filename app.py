@@ -41,8 +41,8 @@ if is_light_mode:
         background: rgba(255, 255, 255, 0.7);
         backdrop-filter: blur(15px);
         -webkit-backdrop-filter: blur(15px);
-        border: 1px solid rgba(168, 85, 247, 0.6);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+        border: 2px solid #a855f7;
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
         padding: 3rem 2rem;
         border-radius: 16px;
         margin-bottom: 2.5rem;
@@ -58,9 +58,13 @@ if is_light_mode:
         background: rgba(255, 255, 255, 0.9) !important;
         backdrop-filter: blur(10px) !important;
         -webkit-backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(168, 85, 247, 0.6) !important;
+        border: 2px solid #a855f7 !important;
         border-radius: 8px !important;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.5) !important;
+        transition: all 0.3s ease;
+    }
+    [data-testid="stExpander"]:hover {
+        box-shadow: 0 0 30px rgba(168, 85, 247, 0.7) !important;
     }
     [data-testid="stExpander"] summary { 
         color: #1e1b4b !important; 
@@ -222,8 +226,8 @@ else:
         background: rgba(23, 11, 36, 0.5);
         backdrop-filter: blur(15px);
         -webkit-backdrop-filter: blur(15px);
-        border: 1px solid rgba(168, 85, 247, 0.4);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+        border: 2px solid #a855f7;
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
         color: white;
         padding: 3rem 2rem;
         border-radius: 16px;
@@ -240,9 +244,13 @@ else:
         background: rgba(23, 11, 36, 0.5) !important;
         backdrop-filter: blur(10px) !important;
         -webkit-backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(168, 85, 247, 0.4) !important;
+        border: 2px solid #a855f7 !important;
         border-radius: 8px !important;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.5) !important;
+        transition: all 0.3s ease;
+    }
+    [data-testid="stExpander"]:hover {
+        box-shadow: 0 0 30px rgba(168, 85, 247, 0.7) !important;
     }
     [data-testid="stExpander"] summary { color: #f8fafc; font-weight: 600; padding: 10px;}
     
