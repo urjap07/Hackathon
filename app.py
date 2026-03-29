@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 
 # --- Constants ---
-N8N_WEBHOOK_URL = "https://hriday.datachef.in/webhook-test/50e12966-853b-4891-9253-a52b8bb359e2"
+N8N_WEBHOOK_URL = "https://hriday.datachef.in/webhook/41ff8937-9d4f-4128-b786-52ab925f1062"
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -405,8 +405,8 @@ col_in1, col_in2 = st.columns(2)
 with col_in1:
     department = st.selectbox("Department", ["HR", "Sales", "Marketing", "Operations"])
 with col_in2:
-    content_type = st.selectbox("Content Type", ["Poster", "Social Media Post", "Internal Memo", "Email Campaign"])
-
+    content_type = st.selectbox("Content Type", ["LinkedIn Post","Poster", "Social Media Post", "Internal Memo", "Email Campaign"])
+ 
 user_prompt = st.text_area("What do you need help with?", placeholder="e.g. Give me a poster for a Shoes Business where there is a 30% discount...", height=120)
 
 if st.button("Generate & Verify", type="primary", use_container_width=True):
